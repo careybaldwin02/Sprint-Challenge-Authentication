@@ -2,6 +2,7 @@ const axios = require('axios');
 const db = require('../database/dbConfig');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const jwtKey = require('../_secrets/keys').jwtKey;
 const { authenticate } = require('./middlewares');
 
 //url is http://localhost:3300/
@@ -20,7 +21,7 @@ function generateToken(user) {
         expiresIn: '1h',
         jwtid: '12345',
     };
-    return jwt.sign(payload,secret,options);
+    return jwt.sign(payload,jwtKey,options);
 }
 
 function register(req, res) {
