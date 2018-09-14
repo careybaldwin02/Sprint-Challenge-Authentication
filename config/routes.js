@@ -4,13 +4,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticate } = require('./middlewares');
 
+//url is http://localhost:3300/
+
 module.exports = server => {
   server.post('/api/register', register);
   server.post('/api/login', login);
   server.get('/api/jokes', authenticate, getJokes);
 };
-
-const secret = 'buy more cheese';
 
 function generateToken(user) {
     const payload = {
@@ -72,6 +72,7 @@ function getJokes(req, res) {
     )
     .then(response => {
       res.status(200).json(response.data);
+      console.log(response.data);
     })
     .catch(err => {
       res.status(500).json({ message: 'Error Fetching Jokes', error: err });
