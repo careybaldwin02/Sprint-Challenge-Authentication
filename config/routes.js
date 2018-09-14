@@ -21,6 +21,8 @@ function generateToken(user) {
         expiresIn: '1h',
         jwtid: '12345',
     };
+
+    //USE THE SECRET PROVIDED IN THE -secrets file
     return jwt.sign(payload,jwtKey,options);
 }
 
