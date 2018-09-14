@@ -1,5 +1,7 @@
 const axios = require('axios');
-
+const db = require('../database/dbConfig');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { authenticate } = require('./middlewares');
 
 module.exports = server => {
@@ -8,8 +10,40 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
+const secret = 'buy more cheese';
+
+function generateToken(user) {
+    const payload = {
+        username: user.username
+    };
+    const options = {
+        expiresIn: '1h',
+        jwtid: '12345',
+    };
+    return jwt.sign(payload,secret,options);
+}
+
 function register(req, res) {
   // implement user registration
+  const creds = req.body;
+  const hash = bcrypt.hashSync(creds.password, 10);
+  creds.password = hash;
+
+  db('users')
+  .insert(creds)
+  .then(ids => {
+    const id = ids[0];
+
+    db('users')
+    .where({id})
+    .first()
+    .then(user => {
+      const token = generateToken(user);
+      res.status(201).json({ id: user.id, token});
+    })
+    .catch(err => res.status(500).send(err));
+  })
+  .catch(err => res.status(500).send(err));
 }
 
 function login(req, res) {
@@ -28,3 +62,5 @@ function getJokes(req, res) {
       res.status(500).json({ message: 'Error Fetching Jokes', error: err });
     });
 }
+
+
